@@ -61,38 +61,39 @@ print('difference = ', np.pi-pi)
 ##Exercise 13
 import numpy as np
 import os
-angles = np.genfromtxt('/home/bram/Documents/data_analysis/muon.dat', delimiter='/n')
+angles = np.genfromtxt('muon.dat', delimiter='/n')
+x = np.cos(angles)
 N=np.size(angles)
 
-# E(t)=0 so  need to use second moment, t=theta
-# E(t^2)= pi^2/3 - 2*xi = M2 (t2-bar)
-# xi = (M2-pi^2/3)/2
-#var(M2) = (M4-M2^2)/N
-#M4 = pi^4/5-4(pi^2-6)*xi
+# xi_hat = 3M1_hat
+# var(xi_hat) = 1/N*(3-xi**2)
 
-x = np.linspace(-np.pi,np.pi,100)
 
-def g(cosx, xi):
-    return (1+xi*cosx)/2
+y = np.linspace(-np.pi,np.pi,100)
 
-#E(xi) = 1/12*t**2(2*cosx*t+3)
-# xi=(2*g-1)/cosx
+def g(x, xi):
+    return (1+xi*x)/2
 
-M2_hat = 0
+
+
+M1_hat = 0
 for i in range(N):
-    M2_hat += 1/N*angles[i]**2
+    M1_hat += 1/N*x[i]
 
-xi = (M2_hat-(np.pi**(2))/3)/2
+
+xi = M1_hat*3
 print('xi =', xi)
 
-M2 = (np.pi**2)/3-2*xi
-M4 = (np.pi**4)/5-4*((np.pi**2)-6)*xi
-var = (M4-M2**2)/N
+
+var = (3-xi**2)/N
 sigma = np.sqrt(var)
 print('sigma =', sigma)
-''
+
 count, bins, ignored=plt.hist(angles, fill=False)
 binwidth = (bins[1]-bins[0])
-plt.plot(x,g(np.cos(x),xi)*N*binwidth)
+plt.plot(y,g(np.cos(y),xi)*N*binwidth, label='expected')
+plt.plot(y,g(np.cos(y),xi+sigma)*N*binwidth, label='upper bound')
+plt.plot(y,g(np.cos(y),xi-sigma)*N*binwidth, label='lower bound')
+plt.legend()
 plt.show()
 
