@@ -4,7 +4,7 @@ from scipy.optimize import minimize
 
 beta = 1/1 #1\tau
 N=100
-N_experiments = 1000
+N_experiments = 100
 nbins = 5
 start = 0
 stop = 5
@@ -38,9 +38,9 @@ def generate_data(N):
     binned_count = bin_count(generated,nbins,start,stop)
     return generated, binned_generated, binned_count
 
-bins = np.linspace(0,5,6)
+bins = np.linspace(start,stop,nbins+1)
 
-def likelyhood(tau,x): #returns negative likelyhood
+def likelihood(tau,x): #returns negative likelihood
     L = 1
     for j in range(nbins):
         prob_interval = np.exp(-bins[j]*tau)-np.exp(-bins[j+1]*tau)
@@ -62,16 +62,16 @@ tau_chi = 0
 #estimate tau for N_experiments and append to create sampling distribution
 for i in range(N_experiments):
     data, binned_data, binned_count = generate_data(N)
-    res_l = np.append(res_l, minimize(likelyhood, x0=0.90, args=binned_count).x[0])
+    res_l = np.append(res_l, minimize(likelihood, x0=0.90, args=binned_count).x[0])
     res_chi = np.append(res_chi, minimize(chi_squared, x0=0.90, args=binned_count).x[0])
     tau_l += res_l[i]/N_experiments
     tau_chi += res_chi[i]/N_experiments
 
-print('From likelyhood, tau = ', tau_l)
+print('From likelihood, tau = ', tau_l)
 print('From Chi squared, tau = ', tau_chi)
 
 plt.figure(1)
-plt.hist(res_l, label="Maximum likelyhood method")
+plt.hist(res_l, label="Maximum likelihood method")
 plt.hist(res_chi, label="Chi-squared method", fill=False)
 plt.legend()
 plt.show()
