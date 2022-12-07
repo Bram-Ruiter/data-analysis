@@ -22,9 +22,9 @@ def k_bounds(N,p,CI): #returns the bounds for k for given p value
     while (p_upper + binomial.pmf(k_max) <(1-CI)/2): #upper tail of probability should always be less than (1-CF)/2
         p_upper += binomial.pmf(k_max)
         k_max -= 1
-    
+
     return p_lower,p_upper,k_min,k_max
-    
+
 prob = np.linspace(0,1,1000) #probability array
 k_min_array = np.array([])
 k_max_array = np.array([])
@@ -45,7 +45,8 @@ ax.legend()
 ax2 = ax.twinx()
 ax2.set_xlabel("prob")
 ax2.set_ylabel("Confidence Interval")
-ax2.plot(prob, CF_array ,label="Confidence Interval")
+ax2.plot(prob, CF_array ,label="Confidence Interval", color ='g')
 ax2.set_ylim(0.80,1)
+
 
 plt.show()

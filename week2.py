@@ -38,7 +38,7 @@ plt.show()
 
 ##Exercise 12
 import numpy as np
-N = 10**7
+N = 10**6
 
 random2d = np.random.uniform(0,1,[2,N]) #generate 2*N random numbers
 
@@ -52,6 +52,7 @@ for i in range(N):
 #In total N pair of numbers generated. within/N gives area of quarter circle = pi/4
 pi = within/N*4
 print('pi =', pi)
+print('sigma = ', 1/N*4*pi*(1-pi/4))
 print('difference = ', np.pi-pi)
 
 #Darts are bernouli distributed with chance pi/4:
