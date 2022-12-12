@@ -4,7 +4,7 @@ import  matplotlib.pyplot as plt
 
 b = 3
 x=4 #take x=4 as an example
-CL = 0.95
+CL = 0.90
 
 def R(x,s): #returns the feldman cousin ratio
     poisson1 = poisson.pmf(x,s+b)
@@ -34,7 +34,7 @@ def n_bounds(x,s,CL): #returns the bounds for #measurements n for a given s valu
     x_max = np.amax(n_array)
     return poisson_cum,x_min,x_max
 
-s_array = np.linspace(0,6,1000)
+s_array = np.linspace(0,10,1000)
 x_min_array = np.array([])
 x_max_array = np.array([])
 CL_array = np.array([])
@@ -45,18 +45,22 @@ for s in s_array:
     x_max_array = np.append(x_max_array,x_max)
 
 fig,ax = plt.subplots()
-ax.set_xlabel("s")
-ax.set_ylabel("n")
-ax.plot(s_array, x_min_array, label="Lower Bound")
-ax.plot(s_array,x_max_array, label="Upper Bound")
+ax.set_xlabel("n")
+ax.set_ylabel("s")
+ax.plot(x_min_array, s_array, label="Lower Bound")
+ax.plot(x_max_array, s_array, label="Upper Bound")
 ax.legend()
-ax.fill_between(s_array, x_min_array,x_max_array, alpha=0.2)
+ax.fill_betweenx(s_array, x_min_array,x_max_array, alpha=0.2)
+ax.set_xlim(0,12)
+ax.set_ylim(0,10)
 
-ax2 = ax.twinx()
-ax2.set_xlabel("prob")
-ax2.set_ylabel("Confidence Interval")
-ax2.plot(s_array, CL_array ,label="Confidence Level", color = 'g')
-ax2.set_ylim(0.80,1)
+
+#legacy: confidence level plot for when plotting with s on the x-axis
+#ax2 = ax.twinx()
+#ax2.set_xlabel("prob")
+#ax2.set_ylabel("Confidence Level")
+#ax2.plot(s_array, CL_array ,label="Confidence Level", color = 'g')
+#ax2.set_ylim(0.80,1)
 
 plt.show()
 
