@@ -4,36 +4,42 @@ import matplotlib.pyplot as plt
 import scipy.stats
 
 ##generate data
-N=1000
-a=0
-b=2*np.pi
+N=50000
 Afb=0.015
-data = np.genfromtxt('asymmetry.dat', delimiter='/n')
+#data = np.genfromtxt('asymmetry.dat', delimiter='/n')
 
 
-def dsigma(x):
-    return 3/8*(1+(np.cos(x))**2)+Afb*np.cos(x)
+def pdf(x):
+    A=Afb
+    return 3/8*(1+x**2)+A*x
 
 def inverse(x):
     return 1/3*(7*np.pi/(-10*(np.pi)**3+54*(np.pi)**2*x+5.1962*(-(np.pi)**4*(9*(np.pi)**2+40*(np.pi)*x-108*x**2))**0.5)**(1/3) + (-10*(np.pi)**3+54*(np.pi)**2*x+5.1962*(-(np.pi)**4*(9*(np.pi)**2+40*(np.pi)*x-108*x**2))**0.5)**(1/3)/(np.pi) -4)
 
 
-def generate_data(N):
+def generate_data(N): #Generates data on the domain -1,1 following the pdf as follows from the differential cross section
     x=np.random.uniform(0,1,N)
-    y  = inverse(x)
+    A=Afb
+    y = np.array([])
+    for i in range(N):
+        p = [1,4*A,3,4-4*A-8*x[i]]
+        for root in np.roots(p): #there are only real roots in our domain, so select for this.
+            if abs(root.imag)<1e-5: #if the root is not complex, append the real part to the generated array
+                y = np.append(y,root.real)
     return y
 
-y = generate_data(10)
-#y = dsigma(x)
+
+#some rules of code to see if the generated data indeed follows the pdf
+y = generate_data(N)
 nbins=50
 count, bins, ignored = plt.hist(y, bins=nbins, histtype='bar', label='Sampled distribution')
 binwidth = (bins[nbins]-bins[0])/nbins
 
-xmin=0
-#xmax=np.max(y)
-xmax=b
+#plot the pdf
+xmin=-1
+xmax=1
 u = np.linspace(xmin,xmax,1000)
-v=dsigma(u)*(N*binwidth)
+v=pdf(u)*(N*binwidth)
 plt.plot(u,v)
 
 plt.show()
@@ -49,6 +55,8 @@ def estimator0(data): #estimate A for a given data set assuming no background
     var_A = (3/2)**2*var_M1
     return A, var_A
 
+
+
 def estimator_background(data): #estimate A for a given data set assuming background
     N_dat =np.size(data)
     M1 = np.sum(data)/N_dat #M1 is the sum of all xi divided by N
@@ -58,10 +66,9 @@ def estimator_background(data): #estimate A for a given data set assuming backgr
     return A, var_A
 
 
-
 ## p value
 def p_value(A, var_A): #determine the p_value from the z-score using that A is assymptotically normally distributed.
-    z_score = A/var_A
+    z_score = A/(var_A**0.5)
     p_value = scipy.stats.norm.sf(abs(z_score))
     return p_value
 
