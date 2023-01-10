@@ -51,6 +51,7 @@ plt.plot(u,v, label ='pdf')
 plt.legend()
 plt.xlabel('cos($\\theta$)')
 plt.ylabel("Count")
+plt.title("Sampling distribution")
 plt.show()
 
 
@@ -133,13 +134,14 @@ def minimize_chi2_background(data, nbins=50):
 
 def determine_N():
     p_crit = 5e-3 #critical p-value
-    N=50 #startpoint for number of data points
+    N=0 #startpoint for number of data points
     Nstep = 10 #iterate over N in steps of Nsteps, can be chosen for desired precision depending on computational power available.
     p_value = 1
     while p_value>p_crit: #iterate over N until critical p_value is reached
+        N += Nstep
         data = generate_data(N)
         A, var_A, p_value = estimator0(data)
-        N += Nstep
+
     return N, A, var_A, p_value
 
 N, A, var_A, p_value = determine_N()
@@ -149,10 +151,34 @@ print("Using this A =", A, " and sigma_A =", var_A**0.5, "are determined.")
 
 
 ## Estimation for the data
-os.chdir('/home/bram/Documents/data-analysis')
+#os.chdir('/home/bram/Documents/data-analysis')
+os.chdir("C:\\Users\\Bram Ruiter\\Downloads")
 data = np.genfromtxt('asymmetry.dat') #load the data
 
 A1, var_A1, p_value1 = estimator_background(data)
 print("Measured from data: \n A =", A1, "\n var_A =", var_A1)
+sigma_A1 = var_A1**0.5
 
+
+## Determine the confindence interval
+def gaussian(x, mu,var):
+    return 1/(var*2*np.pi)**0.5*np.exp(-0.5*((x-mu)**2/var))
+
+
+prob_interval = scipy.stats.norm.cdf(1,A1,sigma_A1) - scipy.stats.norm.cdf(-1,A1,sigma_A1) #the probability that A lies within [-1,1].
+renormalization = 1/prob_interval #renormalization constant so that the probability that A lies within -[1,1] becomes 1.
+
+CL = 0.683 #desired confidence level
+prob = 0
+Amin=A1
+Amax=A1
+Astep = (var_A1)**0.5*0.001 #step size of A: using 0.01sigma as a step size
+
+while prob<CL: #iterate over A in steps of Astep untill the desired confidence level is reached
+    Amin -= Astep
+    Amax += Astep
+    prob = renormalization*(scipy.stats.norm.cdf(Amax,A1,sigma_A1) - scipy.stats.norm.cdf(Amin,A1,sigma_A1))
+
+
+print("For the desired confidence level, A lies within the interval \n[", Amin, ",", Amax, "]")
 
