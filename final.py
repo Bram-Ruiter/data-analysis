@@ -3,11 +3,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 import scipy.stats
 import os
-from scipy.optimize import minimize as minimize
-from scipy.optimize import minimize_scalar as minimize_scalar
+
 
 ##generate data
-Afb=0.015
+Afb=0.015 #the default value used for generating data
 
 def pdf(x, A=Afb): #the pdf which follows from the formula for the differential cross section
     return 3/8*(1+x**2)+A*x
@@ -91,12 +90,12 @@ def determine_N():
 N, A, var_A, p_value = determine_N()
 print("For a p-value of 5e-3 at least N =", N, " data points are needed.")
 print("Using this \n A =", A, " and \n var_A =", var_A, "are determined. \n")
-#Executing determine_N a few times shows it varies from a few hundred to 1000+. This is due to the fact that the numbers are generated randomly so sometimes more favorable nummers are generated resulting in lower variances and hence lower p-values. For iterations which result in relatively low N, the generater could have been lucky in quickly generating a favorable array with low variance.
+#Executing determine_N a few times shows it varies from a few hundred to 1000+. This is due to the fact that the numbers are generated randomly so sometimes more favorable nummers are generated resulting in lower variances and hence lower p-values. For iterations which result in relatively low N, the generater could have been lucky in quickly generating a favorable array with low enough variance.
 
 
 ## Estimation for the data
-os.chdir('/home/bram/Documents/data-analysis') #path to file
-#os.chdir("C:\\Users\\Bram Ruiter\\Downloads")
+#os.chdir('/home/bram/Documents/data-analysis') #path to file
+os.chdir("C:\\Users\\Bram Ruiter\\Downloads")
 data = np.genfromtxt('asymmetry.dat') #load the data
 
 A1, var_A1, p_value1 = estimator_background(data)
